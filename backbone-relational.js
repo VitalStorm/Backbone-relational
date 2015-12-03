@@ -1460,7 +1460,7 @@
 								_.each( createdModels, function( model ) {
 									model.trigger( 'destroy', model, model.collection, options );
 								});
-								
+
 								options.error && options.error.apply( models, arguments );
 							},
 							url: setUrl
@@ -1499,7 +1499,7 @@
 				}
 			);
 		},
-		
+
 		deferArray: function(deferArray) {
 			return Backbone.$.when.apply(null, deferArray);
 		},
@@ -1598,10 +1598,19 @@
 				}
 				else if ( _.isString( includeInJSON ) ) {
 					if ( related instanceof Backbone.Collection ) {
-						value = related.pluck( includeInJSON );
+						value = [];
+						related.each( function( model ) {
+							var modelJSON = model.toJSON( options );
+							if(typeof modelJSON !== 'undefined'){
+								value.push( modelJSON[ includeInJSON ] );
+							}
+						});
 					}
 					else if ( related instanceof Backbone.Model ) {
-						value = related.get( includeInJSON );
+						var relatedJSON = related.toJSON( options );
+						if(typeof relatedJSON !== 'undefined'){
+							value = relatedJSON[ includeInJSON ];
+						}
 					}
 
 					// Add ids for 'unfound' models if includeInJSON is equal to (only) the relatedModel's `idAttribute`
@@ -1623,17 +1632,23 @@
 						value = [];
 						related.each( function( model ) {
 							var curJson = {};
-							_.each( includeInJSON, function( key ) {
-								curJson[ key ] = model.get( key );
-							});
+							var modelJSON = model.toJSON( options );
+							if(typeof modelJSON !== 'undefined'){
+								_.each( includeInJSON, function( key ) {
+									curJson[ key ] = modelJSON[ key ];
+								});
+							}
 							value.push( curJson );
 						});
 					}
 					else if ( related instanceof Backbone.Model ) {
 						value = {};
-						_.each( includeInJSON, function( key ) {
-							value[ key ] = related.get( key );
-						});
+						var relatedJSON = related.toJSON( options );
+						if(typeof relatedJSON !== 'undefined'){
+							_.each( includeInJSON, function( key ) {
+								value[ key ] = relatedJSON[ key ];
+							});
+						}
 					}
 				}
 				else {
