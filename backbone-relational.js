@@ -1578,18 +1578,23 @@
 			if ( this.isLocked() ) {
 				//find relation that is self
 				var relation = null;
+				var me = this;
 				_.each( this._relations, function( rel ) {
-					if(this instanceof rel){
+					if(typeof rel.relatedModel === 'function' && me instanceof rel.relatedModel){
 						relation = rel;
 					}
 				});
-				var includeInJSON = relation.options.includeInJSON;
-				if ( includeInJSON === true ) {
-					return {id: this.id};
-				}else if ( _.isString( includeInJSON ) ) {
+				if(relation){
+					var includeInJSON = relation.options.includeInJSON;
+					if ( includeInJSON === true ) {
+						return {id: this.id};
+					}else if ( _.isString( includeInJSON ) ) {
+						return this.id;
+					}else if ( _.isArray( includeInJSON ) ) {
+						return {id: this.id};
+					}
+				}else{
 					return this.id;
-				}else if ( _.isArray( includeInJSON ) ) {
-					return {id: this.id};
 				}
 			}
 
