@@ -1576,7 +1576,21 @@
 		toJSON: function( options ) {
 			// If this Model has already been fully serialized in this branch once, return to avoid loops
 			if ( this.isLocked() ) {
-				return this.id;
+				//find relation that is self
+				var relation = null;
+				_.each( this._relations, function( rel ) {
+					if(this instanceof rel){
+						relation = rel;
+					}
+				});
+				var includeInJSON = relation.options.includeInJSON;
+				if ( includeInJSON === true ) {
+					return {id: this.id};
+				}else if ( _.isString( includeInJSON ) ) {
+					return this.id;
+				}else if ( _.isArray( includeInJSON ) ) {
+					return {id: this.id};
+				}
 			}
 
 			this.acquire();
