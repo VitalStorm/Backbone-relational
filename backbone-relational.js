@@ -1656,7 +1656,9 @@
 						related.each( function( model ) {
 							var curJson = {};
 							var modelJSON = model.toJSON( options );
-							if(typeof modelJSON !== 'undefined'){
+							if(typeof modelJSON === 'number'){
+								curJson.id = modelJSON;
+							}else if(typeof modelJSON !== 'undefined'){
 								_.each( includeInJSON, function( key ) {
 									curJson[ key ] = modelJSON[ key ];
 								});
@@ -1667,7 +1669,9 @@
 					else if ( related instanceof Backbone.Model ) {
 						value = {};
 						var relatedJSON = related.toJSON( options );
-						if(typeof relatedJSON !== 'undefined'){
+						if(typeof modelJSON === 'number'){
+							value.id = modelJSON;
+						}else if(typeof relatedJSON !== 'undefined'){
 							_.each( includeInJSON, function( key ) {
 								value[ key ] = relatedJSON[ key ];
 							});
